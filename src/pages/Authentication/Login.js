@@ -12,6 +12,7 @@ import {
   FormFeedback,
   Label,
 } from "reactstrap";
+import loginService from "../../services/Auth";
 
 import { Link, useNavigate } from "react-router-dom";
 import withRouter from "../../components/Common/withRouter";
@@ -21,6 +22,7 @@ import { useFormik } from "formik";
 
 import profile from "../../assets/images/profile-img.png";
 import logo from "../../assets/images/logo.svg";
+import toast from "react-hot-toast";
 
 const Login = (props) => {
   const navigate = useNavigate();
@@ -31,16 +33,31 @@ const Login = (props) => {
     enableReinitialize: true,
 
     initialValues: {
-      email: "admin@gmail.com" || "",
-      password: "123456" || "",
+      email: "",
+      password: "",
     },
     validationSchema: Yup.object({
       email: Yup.string().required("Please Enter Your Email"),
       password: Yup.string().required("Please Enter Your Password"),
     }),
     onSubmit: (values) => {
-      localStorage.setItem("authUser", JSON.stringify(values));
-      navigate("/");
+      loginService
+        .Login({
+          email: values?.email,
+          password: values?.password,
+        })
+        .then((res) => {
+          if (res.success === true) {
+            toast.success(res.message);
+            localStorage.setItem("authUser", JSON.stringify(values));
+            navigate("/");
+          } else {
+            toast.error(res.message);
+          }
+        })
+        .catch((err) => {
+          toast.error(err);
+        });
     },
   });
 

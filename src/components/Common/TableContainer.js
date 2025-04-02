@@ -63,6 +63,7 @@ const TableContainer = ({
   customPageSize,
   className,
   customPageSizeOptions,
+  handleAddAdminUser,
 }) => {
   const {
     getTableProps,
@@ -140,6 +141,22 @@ const TableContainer = ({
             setGlobalFilter={setGlobalFilter}
             isJobListGlobalFilter={isJobListGlobalFilter}
           />
+        )}
+
+        {handleAddAdminUser && (
+          <Col sm="6">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                color="primary"
+                className="btn mb-2 me-2"
+                onClick={handleAddAdminUser}
+              >
+                <i className="mdi mdi-plus me-1" />
+                Add Admin
+              </Button>
+            </div>
+          </Col>
         )}
       </Row>
 

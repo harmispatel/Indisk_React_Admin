@@ -136,18 +136,39 @@ const SidebarContent = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <SimpleBar className="h-100" ref={ref}>
         <div id="sidebar-menu">
           <ul className="metismenu list-unstyled" id="side-menu">
             <li>
               <Link to="/">
                 <i className="bx bx-home-circle"></i>
-                <span>Dashboards</span>
+                <span>Dashboard</span>
               </Link>
             </li>
 
             <li>
+              <Link to="/admin-user">
+                <i className="bx bx-user"></i>
+                <span>Admin User</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/restaurant">
+                <i className="bx bx-restaurant"></i>
+                <span>Restaurant</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/restaurant-owner">
+                <i className="bx bx-user-circle"></i>
+                <span>Restaurant Owner</span>
+              </Link>
+            </li>
+
+            {/* <li>
               <Link to="/#" className="has-arrow">
                 <i class="bx bx-cog"></i>
                 <span>Manage Master</span>
@@ -157,11 +178,11 @@ const SidebarContent = () => {
                   <Link to="/manage-master/display-name">- Display Name</Link>
                 </li>
               </ul>
-            </li>
+            </li> */}
           </ul>
         </div>
       </SimpleBar>
-    </React.Fragment>
+    </>
   );
 };
 

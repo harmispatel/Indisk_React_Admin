@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dropdown, DropdownToggle, DropdownMenu } from "reactstrap";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import withRouter from "../Common/withRouter";
 
 import user1 from "../../assets/images/users/avatar-1.jpg";
 
 const ProfileMenu = () => {
+  const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
 
   const [username, setusername] = useState("Admin");
@@ -25,6 +26,11 @@ const ProfileMenu = () => {
       }
     }
   }, []);
+
+  const logOut = useCallback(() => {
+    localStorage.removeItem("authUser");
+    navigate("/login");
+  }, [navigate]);
 
   return (
     <>
@@ -53,10 +59,10 @@ const ProfileMenu = () => {
           </Link>
 
           <div className="dropdown-divider" />
-          <Link to="/login" className="dropdown-item">
+          <button className="dropdown-item" onClick={logOut}>
             <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
             <span>Logout</span>
-          </Link>
+          </button>
         </DropdownMenu>
       </Dropdown>
     </>

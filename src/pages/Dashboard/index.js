@@ -10,7 +10,7 @@ const Dashboard = (props) => {
     <>
       <div className="page-content">
         <Container fluid>
-          <Breadcrumbs title="Dashboards" breadcrumbItem="Dashboard" />
+          <Breadcrumbs title="Dashboard" breadcrumbItem="Dashboard" />
         </Container>
       </div>
     </>

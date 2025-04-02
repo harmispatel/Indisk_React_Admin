@@ -4,6 +4,7 @@ import { authProtectedRoutes, publicRoutes } from "./routes";
 import Authmiddleware from "./routes/route";
 import VerticalLayout from "./components/VerticalLayout/";
 import NonAuthLayout from "./components/NonAuthLayout";
+import { Toaster } from "react-hot-toast";
 
 import "./assets/scss/theme.scss";
 
@@ -14,6 +15,7 @@ fakeBackend();
 const App = () => {
   return (
     <>
+     <Toaster toastOptions={{ duration: 2000 }} />
       <Routes>
         {publicRoutes.map((route, idx) => (
           <Route
