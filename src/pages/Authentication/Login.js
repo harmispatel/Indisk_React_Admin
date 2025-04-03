@@ -1,6 +1,5 @@
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import React from "react";
-
 import {
   Row,
   Col,
@@ -12,26 +11,24 @@ import {
   FormFeedback,
   Label,
 } from "reactstrap";
-import loginService from "../../services/Auth";
-
 import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import toast from "react-hot-toast";
+import loginService from "../../services/Auth";
 import withRouter from "../../components/Common/withRouter";
 
-import * as Yup from "yup";
-import { useFormik } from "formik";
+import profile from "../../assets/images/indisk-kitchen-logo.png";
+import logo from "../../assets/images/Indisk_logo.png";
 
-import profile from "../../assets/images/profile-img.png";
-import logo from "../../assets/images/logo.svg";
-import toast from "react-hot-toast";
-
-const Login = (props) => {
+const Login = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
-  document.title = "Login";
+  document.title = "Login | Indisk";
 
   const validation = useFormik({
     enableReinitialize: true,
-
     initialValues: {
       email: "",
       password: "",
@@ -63,7 +60,7 @@ const Login = (props) => {
 
   return (
     <React.Fragment>
-      <div className="account-pages my-5 pt-sm-5">
+      <div className="account-pages">
         <Container>
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
@@ -73,11 +70,11 @@ const Login = (props) => {
                     <Col xs={7}>
                       <div className="text-primary p-4">
                         <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to Ecommerce.</p>
+                        <p>Sign in to continue to Indisk</p>
                       </div>
                     </Col>
-                    <Col className="col-5 align-self-end">
-                      <img src={profile} alt="" className="img-fluid" />
+                    <Col className="col-5 login-bg-image">
+                      <img src={profile} alt="" />
                     </Col>
                   </Row>
                 </div>
@@ -90,7 +87,8 @@ const Login = (props) => {
                             src={logo}
                             alt=""
                             className="rounded-circle"
-                            height="34"
+                            height="75"
+                            width="100"
                           />
                         </span>
                       </div>
@@ -107,22 +105,26 @@ const Login = (props) => {
                     >
                       <div className="mb-3">
                         <Label className="form-label">Email</Label>
-                        <Input
-                          name="email"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          value={validation.values.email || ""}
-                          invalid={
-                            validation.touched.email && validation.errors.email
-                              ? true
-                              : false
-                          }
-                        />
+                        <div className="input-group">
+                          <span className="input-group-text">
+                            <i className="mdi mdi-email" />
+                          </span>
+                          <Input
+                            name="email"
+                            className="form-control"
+                            placeholder="Enter email"
+                            type="email"
+                            onChange={validation.handleChange}
+                            onBlur={validation.handleBlur}
+                            value={validation.values.email || ""}
+                            invalid={
+                              validation.touched.email &&
+                              validation.errors.email
+                            }
+                          />
+                        </div>
                         {validation.touched.email && validation.errors.email ? (
-                          <FormFeedback type="invalid">
+                          <FormFeedback className="d-block">
                             {validation.errors.email}
                           </FormFeedback>
                         ) : null}
@@ -130,40 +132,40 @@ const Login = (props) => {
 
                       <div className="mb-3">
                         <Label className="form-label">Password</Label>
-                        <Input
-                          name="password"
-                          value={validation.values.password || ""}
-                          type="password"
-                          placeholder="Enter Password"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          invalid={
-                            validation.touched.password &&
-                            validation.errors.password
-                              ? true
-                              : false
-                          }
-                        />
+                        <div className="input-group">
+                          <span className="input-group-text">
+                            <i className="mdi mdi-lock" />
+                          </span>
+                          <Input
+                            name="password"
+                            value={validation.values.password || ""}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter Password"
+                            onChange={validation.handleChange}
+                            onBlur={validation.handleBlur}
+                            invalid={
+                              validation.touched.password &&
+                              validation.errors.password
+                            }
+                          />
+                          <span
+                            className="input-group-text"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <span class="mdi mdi-eye-off-outline"></span>
+                            ) : (
+                              <span class="mdi mdi-eye-outline"></span>
+                            )}
+                          </span>
+                        </div>
                         {validation.touched.password &&
                         validation.errors.password ? (
-                          <FormFeedback type="invalid">
+                          <FormFeedback className="d-block">
                             {validation.errors.password}
                           </FormFeedback>
                         ) : null}
-                      </div>
-
-                      <div className="form-check">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id="customControlInline"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="customControlInline"
-                        >
-                          Remember me
-                        </label>
                       </div>
 
                       <div className="mt-3 d-grid">
@@ -177,7 +179,7 @@ const Login = (props) => {
 
                       <div className="mt-4 text-center">
                         <Link to="/forgot-password" className="text-muted">
-                          <i className="mdi mdi-lock me-1" />
+                          <i className="mdi mdi-lock-reset me-1" />
                           Forgot your password?
                         </Link>
                       </div>

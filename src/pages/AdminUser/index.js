@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import adminService from "../../services/AdminUser";
 import toast from "react-hot-toast";
+import DeleteModal from "../../components/Common/DeleteModal";
 
 const AdminUser = () => {
   const [addAdminModel, setAdminModel] = useState(false);
@@ -32,6 +33,8 @@ const AdminUser = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [adminData, setAdminData] = useState([]);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteUser, setDeleteUser] = useState(null);
 
   const toggleImageModal = () => {
     setIsImageModalOpen(!isImageModalOpen);
@@ -77,11 +80,20 @@ const AdminUser = () => {
     setviewAdmin(data);
   };
 
-  const handleDelete = (data) => {
+  const toggleDeleteModal = () => {
+    setDeleteModal(!deleteModal);
+  };
+
+  const confirmDelete = (data) => {
+    setDeleteUser(data);
+    toggleDeleteModal();
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteUser) return;
+
     adminService
-      .deleteAdmin({
-        id: data?._id,
-      })
+      .deleteAdmin({ id: deleteUser._id })
       .then((res) => {
         if (res.success === true) {
           toast.success(res.message);
@@ -91,17 +103,19 @@ const AdminUser = () => {
         }
       })
       .catch((err) => {
-        toast.success(err);
+        toast.error(err);
       });
+
+    toggleDeleteModal();
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  const handleImageChange = (event) => {
+    const file = event.currentTarget.files[0];
     if (file) {
+      formik.setFieldValue("image", file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        formik.setFieldValue("image", reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -164,7 +178,7 @@ const AdminUser = () => {
               <Link
                 to="#"
                 className="text-danger"
-                onClick={() => handleDelete(row.original)}
+                onClick={() => confirmDelete(row.original)}
               >
                 <i className="mdi mdi-delete font-size-18" id="deletetooltip" />
                 <UncontrolledTooltip placement="top" target="deletetooltip">
@@ -186,7 +200,7 @@ const AdminUser = () => {
       name: (user && user?.name) || "",
       email: (user && user?.email) || "",
       password: (user && user?.password) || "",
-      // image: Yup.mixed().required("Image is required"),
+      image: (user && user?.image) || "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required!"),
@@ -195,6 +209,17 @@ const AdminUser = () => {
         .max(255)
         .required("Email is required"),
       password: Yup.string().required("Password is required"),
+      image: Yup.mixed()
+        .required("Image is required")
+        .test("fileSize", "File too large. Max size is 5MB", (value) => {
+          return value && value.size <= 5000000;
+        })
+        .test("fileFormat", "Unsupported Format", (value) => {
+          return (
+            value &&
+            ["image/jpg", "image/jpeg", "image/png"].includes(value.type)
+          );
+        }),
     }),
     onSubmit: (values) => {
       if (isEdit) {
@@ -355,15 +380,13 @@ const AdminUser = () => {
                     <div className="mb-3">
                       <Label className="form-label">Image</Label>
                       <Input
-                        name="image"
                         type="file"
-                        accept="image/jpeg, image/png"
-                        onChange={handleFileChange}
-                        invalid={
-                          formik.touched.image && formik.errors.image
-                            ? true
-                            : false
-                        }
+                        name="image"
+                        id="image"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        onBlur={formik.handleBlur}
+                        invalid={formik.touched.image && formik.errors.image}
                       />
                       {imagePreview && (
                         <div className="mt-3">
@@ -400,6 +423,7 @@ const AdminUser = () => {
               </form>
             </ModalBody>
           </Modal>
+
           <Modal isOpen={isImageModalOpen} toggle={toggleImageModal} centered>
             <ModalHeader toggle={toggleImageModal}>View Image</ModalHeader>
             <ModalBody>
@@ -413,6 +437,13 @@ const AdminUser = () => {
           </Modal>
         </Container>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        show={deleteModal}
+        onDeleteClick={handleConfirmDelete}
+        onCloseClick={() => setDeleteModal(false)}
+      />
     </>
   );
 };

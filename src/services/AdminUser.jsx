@@ -1,6 +1,6 @@
 import Call from "./Call";
 
-const getAdmin = async (data) => {
+const getAdmin = async () => {
   let d = await Call({
     path: "api/admin-list",
     method: "get",
