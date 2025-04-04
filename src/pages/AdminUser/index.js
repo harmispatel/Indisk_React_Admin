@@ -250,7 +250,8 @@ const AdminUser = () => {
             name: values?.name,
             email: values?.email,
             password: values?.password,
-            image: values?.image,
+            image:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiibOngFYog5Ri5UoFKH3CsHMOvomBLf4JAw&s",
           })
           .then((res) => {
             if (res.success === true) {
