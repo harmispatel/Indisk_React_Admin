@@ -205,12 +205,12 @@ const AdminUser = () => {
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required!"),
       email: Yup.string()
-        .email("Must be a valid Email")
+        .email("Must be a valid Email!")
         .max(255)
-        .required("Email is required"),
+        .required("Email is required!"),
       password: Yup.string().required("Password is required"),
       image: Yup.mixed()
-        .required("Image is required")
+        .required("Image is required!")
         .test("fileSize", "File too large. Max size is 5MB", (value) => {
           return value && value.size <= 5000000;
         })

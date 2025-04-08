@@ -8,6 +8,8 @@ import ForgetPwd from "../pages/Authentication/ForgetPassword";
 import Dashboard from "../pages/Dashboard/index";
 
 import AdminUser from "../pages/AdminUser";
+import RestaurantOwner from "../pages/RestaurantOwner";
+import Restaurant from "../pages/Restaurant";
 
 const authProtectedRoutes = [
   { path: "/", component: <Dashboard /> },
@@ -17,8 +19,8 @@ const authProtectedRoutes = [
     component: <Navigate to="/dashboard" />,
   },
   { path: "/admin-user", component: <AdminUser /> },
-  { path: "/restaurant", component: <ForgetPwd /> },
-  { path: "/restaurant-owner", component: <ForgetPwd /> },
+  { path: "/restaurant", component: <Restaurant /> },
+  { path: "/restaurant-owner", component: <RestaurantOwner /> },
 ];
 
 const publicRoutes = [

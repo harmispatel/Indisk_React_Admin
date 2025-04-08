@@ -1,34 +1,34 @@
 import Call from "./Call";
 
-const getAdmin = async () => {
+const getRestaurant = async () => {
   let d = await Call({
-    path: "api/admin-list",
+    path: "api/restaurant-list",
     method: "GET",
   });
   return d;
 };
 
-const addAdmin = async (data) => {
+const addRestaurant = async (data) => {
   let d = await Call({
-    path: "api/admin-create",
+    path: "api/restaurant-create",
     method: "POST",
     data,
   });
   return d;
 };
 
-const editAdmin = async (data) => {
+const editRestaurant = async (data) => {
   let d = await Call({
-    path: "api/admin-update",
+    path: "api/restaurant-update",
     method: "PUT",
     data,
   });
   return d;
 };
 
-const deleteAdmin = async (data) => {
+const deleteRestaurant = async (data) => {
   let d = await Call({
-    path: "api/admin-delete",
+    path: "api/restaurant-delete",
     method: "DELETE",
     data,
   });
@@ -36,10 +36,10 @@ const deleteAdmin = async (data) => {
 };
 
 const exportObject = {
-  getAdmin,
-  addAdmin,
-  editAdmin,
-  deleteAdmin,
+  getRestaurant,
+  addRestaurant,
+  editRestaurant,
+  deleteRestaurant,
 };
 
 export default exportObject;

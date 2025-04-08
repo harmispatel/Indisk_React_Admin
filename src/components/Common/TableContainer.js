@@ -64,6 +64,8 @@ const TableContainer = ({
   className,
   customPageSizeOptions,
   handleAddAdminUser,
+  handleAddRestaurant,
+  handleAddRestaurantOwner,
 }) => {
   const {
     getTableProps,
@@ -154,6 +156,38 @@ const TableContainer = ({
               >
                 <i className="mdi mdi-plus me-1" />
                 Add Admin
+              </Button>
+            </div>
+          </Col>
+        )}
+
+        {handleAddRestaurant && (
+          <Col sm="6">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                color="primary"
+                className="btn mb-2 me-2"
+                onClick={handleAddRestaurant}
+              >
+                <i className="mdi mdi-plus me-1" />
+                Add Restaurant
+              </Button>
+            </div>
+          </Col>
+        )}
+
+        {handleAddRestaurantOwner && (
+          <Col sm="6">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                color="primary"
+                className="btn mb-2 me-2"
+                onClick={handleAddRestaurant}
+              >
+                <i className="mdi mdi-plus me-1" />
+                Add Restaurant owner
               </Button>
             </div>
           </Col>
