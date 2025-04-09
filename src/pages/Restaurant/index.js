@@ -29,11 +29,12 @@ const Restaurant = () => {
   const [restaurantData, setRestaurantData] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteRestaurant, setDeleteRestaurant] = useState(null);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
   const [restaurantModel, setRestaurantModel] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [restaurant, setRestaurant] = useState(null);
+  const [viewRestaurant, setViewRestaurant] = useState(false);
+  const [viewRestaurantData, setViewRestaurantData] = useState(null);
 
   const getRestaurantData = () => {
     restaurantService
@@ -101,19 +102,35 @@ const Restaurant = () => {
         Cell: ({ row }) => {
           return (
             <div className="d-flex gap-3">
-              <Link to="#" className="text-success">
-                <i
-                  className="mdi mdi-eye-outline font-size-18"
-                  id="viewtooltip"
-                ></i>
-                <UncontrolledTooltip placement="top" target="viewtooltip">
-                  View
-                </UncontrolledTooltip>
-              </Link>
               <Link
                 to="#"
                 className="text-success"
-                onClick={() => handleEditRestaurant(row.original)}
+                onClick={() => {
+                  toggleRestaurantViewModal();
+                  setViewRestaurantData(row.original);
+                }}
+              >
+                <i
+                  className="mdi mdi-eye-outline font-size-18"
+                  id={`viewtooltip-${row.original.id}`}
+                ></i>
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`viewtooltip-${row.original.id}`}
+                >
+                  View
+                </UncontrolledTooltip>
+              </Link>
+
+              <Link
+                to="#"
+                className="text-success"
+                onClick={() => {
+                  setRestaurant(row.original);
+                  setImagePreview(row.original.logo);
+                  setIsEdit(true);
+                  toggleModal();
+                }}
               >
                 <i className="mdi mdi-pencil font-size-18" id="edittooltip" />
                 <UncontrolledTooltip placement="top" target="edittooltip">
@@ -135,7 +152,7 @@ const Restaurant = () => {
         },
       },
     ],
-    []
+    [restaurantData]
   );
 
   const toggleDeleteModal = () => {
@@ -173,35 +190,10 @@ const Restaurant = () => {
     setRestaurant(null);
     setIsEdit(false);
     toggleModal();
+    setImagePreview(null);
   };
 
-  const handleEditRestaurant = (data) => {
-    setRestaurant(data);
-    setIsEdit(true);
-    toggleModal();
-  };
-
-  const toggleImageModal = () => {
-    setIsImageModalOpen(!isImageModalOpen);
-  };
-
-  const handleImageClick = () => {
-    if (imagePreview) {
-      toggleImageModal();
-    }
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      formik.setFieldValue("image", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const toggleRestaurantViewModal = () => setViewRestaurant(!viewRestaurant);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -210,10 +202,10 @@ const Restaurant = () => {
       restaurant_name: restaurant?.restaurant_name || "",
       email: restaurant?.email || "",
       contact: restaurant?.contact || "",
-      logo: null,
+      logo: restaurant?.logo || "",
       description: restaurant?.description || "",
       tagLine: restaurant?.tagLine || "",
-      isActive: restaurant?.isActive || false,
+      isActive: restaurant?.isActive || "",
       website_link: restaurant?.website_link || "",
     },
     validationSchema: Yup.object({
@@ -225,16 +217,19 @@ const Restaurant = () => {
         .matches(/^\d{10}$/, "Contact must be 10 digits")
         .required("Contact is required!"),
       logo: Yup.mixed()
-        .required("Logo image is required!")
-        .test("fileSize", "File too large. Max size is 5MB", (value) => {
-          return value && value.size <= 5 * 1024 * 1024;
+        .test("fileRequired", "Logo image is required!", function (value) {
+          if (isEdit && typeof value === "string") return true;
+          return value && value instanceof File;
         })
-        .test("fileFormat", "Unsupported file format", (value) => {
-          return (
-            value &&
-            ["image/jpg", "image/jpeg", "image/png"].includes(value.type)
-          );
+        .test("fileSize", "File too large. Max size is 5MB", function (value) {
+          if (!value || typeof value === "string") return true;
+          return value.size <= 5 * 1024 * 1024;
+        })
+        .test("fileFormat", "Unsupported file format", function (value) {
+          if (!value || typeof value === "string") return true;
+          return ["image/jpg", "image/jpeg", "image/png"].includes(value.type);
         }),
+
       description: Yup.string().required("Description is required!"),
       tagLine: Yup.string().required("Tagline is required!"),
       isActive: Yup.string().required("Status is required!"),
@@ -254,7 +249,7 @@ const Restaurant = () => {
       formData.append("website_link", values.website_link);
 
       if (isEdit) {
-        formData.append("id", restaurantData?._id);
+        formData.append("id", restaurant?._id);
         restaurantService
           .editRestaurant(formData)
           .then((res) => {
@@ -451,12 +446,9 @@ const Restaurant = () => {
                         accept="image/*"
                         onChange={(event) => {
                           const file = event.currentTarget.files[0];
-                          formik.setFieldValue("logo", file);
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () =>
-                              setImagePreview(reader.result);
-                            reader.readAsDataURL(file);
+                            formik.setFieldValue("logo", file);
+                            setImagePreview(URL.createObjectURL(file));
                           }
                         }}
                         onBlur={formik.handleBlur}
@@ -469,12 +461,7 @@ const Restaurant = () => {
                           <img
                             src={imagePreview}
                             alt="Logo Preview"
-                            className="img-thumbnail"
-                            style={{
-                              maxWidth: "100px",
-                              maxHeight: "100px",
-                              cursor: "pointer",
-                            }}
+                            className="avatar-md"
                           />
                         </div>
                       )}
@@ -489,16 +476,22 @@ const Restaurant = () => {
                         name="isActive"
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        value={formik.values.isActive}
+                        value={formik.values.isActive || ""}
                         invalid={
-                          formik.touched.isActive && !!formik.errors.isActive
+                          formik.touched.isActive && formik.errors.isActive
+                            ? true
+                            : false
                         }
                       >
                         <option value="">Select Status</option>
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </Input>
-                      <FormFeedback>{formik.errors.isActive}</FormFeedback>
+                      {formik.touched.isActive && formik.errors.isActive ? (
+                        <FormFeedback type="invalid">
+                          {formik.errors.isActive}
+                        </FormFeedback>
+                      ) : null}
                     </div>
                   </Col>
                 </Row>
@@ -513,6 +506,114 @@ const Restaurant = () => {
                   </Col>
                 </Row>
               </form>
+            </ModalBody>
+          </Modal>
+
+          <Modal
+            isOpen={viewRestaurant}
+            toggle={toggleRestaurantViewModal}
+            size="lg"
+            centered
+          >
+            <ModalHeader
+              toggle={toggleRestaurantViewModal}
+              className="bg-light"
+            >
+              <h5 className="mb-0">
+                <i className="mdi mdi-silverware-fork-knife me-2"></i>
+                View Restaurant Details -{" "}
+                <span className="text-primary">
+                  {viewRestaurantData?.restaurant_name}
+                </span>
+              </h5>
+            </ModalHeader>
+
+            <ModalBody className="py-4 px-4">
+              {viewRestaurantData && (
+                <>
+                  <div className="row">
+                    <div className="col-md-5">
+                      <div>
+                        <Label className="fw-semibold text-muted mb-2 d-flex align-items-center">
+                          Logo:
+                        </Label>
+                        <div className="border rounded p-2 text-center bg-light">
+                          <img
+                            src={viewRestaurantData.logo}
+                            alt="restaurant-logo"
+                            className="img-fluid"
+                            style={{ maxHeight: "240px", objectFit: "contain" }}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          Restaurant Name:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.restaurant_name}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-7">
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          Email:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.email}
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          Contact:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.contact}
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          Website link:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.website_link}
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          TagLine:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.tagLine}
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          Description:
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.description}
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <Label className="fw-semibold text-muted d-flex align-items-center">
+                          isActive?
+                        </Label>
+                        <div className="border rounded p-2 bg-light">
+                          {viewRestaurantData.isActive}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </ModalBody>
           </Modal>
         </Container>

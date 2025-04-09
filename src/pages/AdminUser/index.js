@@ -65,6 +65,7 @@ const AdminUser = () => {
 
   const handleEditClick = (users) => {
     setUser(users);
+    setImagePreview(users.image);
     setIsEdit(true);
     toggleModal();
   };
@@ -73,6 +74,7 @@ const AdminUser = () => {
     setUser(null);
     setIsEdit(false);
     toggleModal();
+    setImagePreview(null);
   };
 
   const handleViewClick = (data) => {
@@ -109,18 +111,6 @@ const AdminUser = () => {
     toggleDeleteModal();
   };
 
-  const handleImageChange = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      formik.setFieldValue("image", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const columns = useMemo(
     () => [
       {
@@ -142,11 +132,15 @@ const AdminUser = () => {
         filterable: true,
       },
       {
-        Header: "Logo",
+        Header: "Image",
         accessor: "image",
         disableFilters: true,
         filterable: false,
-        Cell: ({ value }) => <img className="avatar-md" src={value} alt="" />,
+        Cell: ({ value }) => (
+          <div className="d-flex justify-content-center align-items-center">
+            <img className="avatar-md" src={value} alt="" />
+          </div>
+        ),
       },
 
       {
@@ -210,28 +204,30 @@ const AdminUser = () => {
         .required("Email is required!"),
       password: Yup.string().required("Password is required"),
       image: Yup.mixed()
-        .required("Image is required!")
-        .test("fileSize", "File too large. Max size is 5MB", (value) => {
-          return value && value.size <= 5000000;
+        .test("fileRequired", "image is required!", function (value) {
+          if (isEdit && typeof value === "string") return true;
+          return value && value instanceof File;
         })
-        .test("fileFormat", "Unsupported Format", (value) => {
-          return (
-            value &&
-            ["image/jpg", "image/jpeg", "image/png"].includes(value.type)
-          );
+        .test("fileSize", "File too large. Max size is 5MB", function (value) {
+          if (!value || typeof value === "string") return true;
+          return value.size <= 5 * 1024 * 1024;
+        })
+        .test("fileFormat", "Unsupported file format", function (value) {
+          if (!value || typeof value === "string") return true;
+          return ["image/jpg", "image/jpeg", "image/png"].includes(value.type);
         }),
     }),
     onSubmit: (values) => {
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("image", values.image);
+
       if (isEdit) {
+        formData.append("id", user?._id);
         adminService
-          .editAdmin({
-            id: user?._id,
-            name: values?.name,
-            email: values?.email,
-            password: values?.password,
-            image:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiibOngFYog5Ri5UoFKH3CsHMOvomBLf4JAw&s",
-          })
+          .editAdmin(formData)
           .then((res) => {
             if (res.success === true) {
               toast.success(res.message);
@@ -246,13 +242,7 @@ const AdminUser = () => {
           });
       } else {
         adminService
-          .addAdmin({
-            name: values?.name,
-            email: values?.email,
-            password: values?.password,
-            image:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiibOngFYog5Ri5UoFKH3CsHMOvomBLf4JAw&s",
-          })
+          .addAdmin(formData)
           .then((res) => {
             if (res.success === true) {
               toast.success(res.message);
@@ -383,24 +373,23 @@ const AdminUser = () => {
                       <Input
                         type="file"
                         name="image"
-                        id="image"
                         accept="image/*"
-                        onChange={handleImageChange}
+                        onChange={(event) => {
+                          const file = event.currentTarget.files[0];
+                          if (file) {
+                            formik.setFieldValue("image", file);
+                            setImagePreview(URL.createObjectURL(file));
+                          }
+                        }}
                         onBlur={formik.handleBlur}
-                        invalid={formik.touched.image && formik.errors.image}
+                        invalid={formik.touched.image && !!formik.errors.image}
                       />
                       {imagePreview && (
-                        <div className="mt-3">
+                        <div className="mt-2">
                           <img
                             src={imagePreview}
-                            alt="Preview"
-                            className="img-fluid rounded"
-                            style={{
-                              maxWidth: "100px",
-                              maxHeight: "100px",
-                              cursor: "pointer",
-                            }}
-                            onClick={handleImageClick}
+                            alt="image_Preview"
+                            className="avatar-md"
                           />
                         </div>
                       )}

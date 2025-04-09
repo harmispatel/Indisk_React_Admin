@@ -184,7 +184,7 @@ const TableContainer = ({
                 type="button"
                 color="primary"
                 className="btn mb-2 me-2"
-                onClick={handleAddRestaurant}
+                onClick={handleAddRestaurantOwner}
               >
                 <i className="mdi mdi-plus me-1" />
                 Add Restaurant owner
