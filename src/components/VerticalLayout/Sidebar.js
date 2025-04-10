@@ -5,21 +5,15 @@ import SidebarContent from "./SidebarContent";
 
 import { Link } from "react-router-dom";
 
-import logoLightPng from "../../assets/images/logo-light.png";
-import logoLightSvg from "../../assets/images/logo-light.svg";
+import logoLightSvg from "../../assets/images/Indisk_logo.png";
 
 const Sidebar = (props) => {
   return (
     <React.Fragment>
       <div className="vertical-menu">
         <div className="navbar-brand-box">
-          <Link to="/" className="logo logo-light">
-            <span className="logo-sm">
-              <img src={logoLightSvg} alt="" height="22" />
-            </span>
-            <span className="logo-lg">
-              <img src={logoLightPng} alt="" height="19" />
-            </span>
+          <Link to="/" className="logo logo-light mt-2">
+            <img src={logoLightSvg} alt="" width={75} />
           </Link>
         </div>
         <div data-simplebar className="h-100">

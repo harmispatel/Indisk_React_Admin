@@ -10,22 +10,16 @@ const ProfileMenu = () => {
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
 
-  const [username, setusername] = useState("Admin");
+  const authUserString = localStorage.getItem("authUser");
+  const authUserObject = JSON.parse(authUserString);
+
+  const [username, setUserName] = useState(authUserObject?.email);
 
   useEffect(() => {
     if (localStorage.getItem("authUser")) {
-      if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-        const obj = JSON.parse(localStorage.getItem("authUser"));
-        setusername(obj.displayName);
-      } else if (
-        process.env.REACT_APP_DEFAULTAUTH === "fake" ||
-        process.env.REACT_APP_DEFAULTAUTH === "jwt"
-      ) {
-        const obj = JSON.parse(localStorage.getItem("authUser"));
-        setusername(obj.username);
-      }
+      setUserName(authUserObject?.email);
     }
-  }, []);
+  }, [authUserObject]);
 
   const logOut = useCallback(() => {
     localStorage.removeItem("authUser");
