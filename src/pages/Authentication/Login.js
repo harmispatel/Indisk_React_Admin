@@ -23,9 +23,8 @@ import logo from "../../assets/images/Indisk_logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
-
-  document.title = "Login | Indisk";
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -38,6 +37,7 @@ const Login = () => {
       password: Yup.string().required("Please Enter Your Password"),
     }),
     onSubmit: (values) => {
+      setLoading(true);
       loginService
         .Login({
           email: values?.email,
@@ -54,9 +54,14 @@ const Login = () => {
         })
         .catch((err) => {
           toast.error(err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
   });
+
+  document.title = "Login | Indisk";
 
   return (
     <React.Fragment>
@@ -170,10 +175,18 @@ const Login = () => {
 
                       <div className="mt-3 d-grid">
                         <button
-                          className="btn btn-primary btn-block"
+                          className="btn btn-primary btn-block d-flex justify-content-center align-content-center"
                           type="submit"
+                          disabled={loading}
                         >
-                          Log In
+                          {loading ? (
+                            <span
+                              className="spinner-border spinner-border-sm me-2"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                          ) : null}
+                          {loading ? "Logging in..." : "Log In"}
                         </button>
                       </div>
 

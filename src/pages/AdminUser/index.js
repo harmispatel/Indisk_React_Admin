@@ -35,6 +35,8 @@ const AdminUser = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteUser, setDeleteUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleImageModal = () => {
     setIsImageModalOpen(!isImageModalOpen);
@@ -49,6 +51,7 @@ const AdminUser = () => {
   const toggleModal = () => setAdminModel(!addAdminModel);
 
   const getAdminData = () => {
+    setLoading(true);
     adminService
       .getAdmin()
       .then((res) => {
@@ -56,7 +59,8 @@ const AdminUser = () => {
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -218,6 +222,7 @@ const AdminUser = () => {
         }),
     }),
     onSubmit: (values) => {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("email", values.email);
@@ -239,7 +244,8 @@ const AdminUser = () => {
           })
           .catch((err) => {
             toast.error(err);
-          });
+          })
+          .finally(() => setIsLoading(false));
       } else {
         adminService
           .addAdmin(formData)
@@ -255,7 +261,8 @@ const AdminUser = () => {
           })
           .catch((err) => {
             toast.error(err);
-          });
+          })
+          .finally(() => setIsLoading(false));
       }
     },
   });
@@ -267,23 +274,36 @@ const AdminUser = () => {
       <div className="page-content">
         <Container fluid>
           <Breadcrumbs title="Manage Admin Users" breadcrumbItem="Users" />
-          <Row>
-            <Col lg="12">
-              <Card>
-                <CardBody>
-                  <TableContainer
-                    columns={columns}
-                    data={adminData}
-                    isGlobalFilter={true}
-                    isAddAdminUser={true}
-                    handleAddAdminUser={handleAddAdminUser}
-                    customPageSize={10}
-                    className="custom-header-css"
-                  />
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
+          {loading ? (
+            <div className="text-center mt-5 pt-5">
+              <span
+                className="spinner-border spinner-border-md"
+                role="status"
+                aria-hidden="true"
+                style={{ width: "3rem", height: "3rem" }}
+              ></span>
+            </div>
+          ) : (
+            <>
+              <Row>
+                <Col lg="12">
+                  <Card>
+                    <CardBody>
+                      <TableContainer
+                        columns={columns}
+                        data={adminData}
+                        isGlobalFilter={true}
+                        isAddAdminUser={true}
+                        handleAddAdminUser={handleAddAdminUser}
+                        customPageSize={10}
+                        className="custom-header-css"
+                      />
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+            </>
+          )}
 
           <Modal
             isOpen={addAdminModel}
@@ -404,7 +424,18 @@ const AdminUser = () => {
                 <Row>
                   <Col>
                     <div className="text-end">
-                      <Button type="submit" color="success">
+                      <Button
+                        type="submit"
+                        color="success"
+                        disabled={isLoading}
+                      >
+                        {isLoading && (
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        )}
                         {isEdit ? "Update" : "Save"}
                       </Button>
                     </div>

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -21,6 +21,8 @@ import loginService from "../../services/Auth";
 import toast from "react-hot-toast";
 
 const ForgetPasswordPage = () => {
+  const [loading, setLoading] = useState(false);
+
   const validation = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -30,6 +32,7 @@ const ForgetPasswordPage = () => {
       email: Yup.string().required("Please Enter Your Email"),
     }),
     onSubmit: (values) => {
+      setLoading(true);
       loginService
         .ForgotPassword({
           email: values?.email,
@@ -43,6 +46,9 @@ const ForgetPasswordPage = () => {
         })
         .catch((err) => {
           toast.error(err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
   });
@@ -132,11 +138,19 @@ const ForgetPasswordPage = () => {
                         ) : null}
                       </div>
                       <Row className="mb-3">
-                        <Col className="text-end">
+                        <Col className="d-flex justify-content-center">
                           <button
-                            className="btn btn-primary w-md "
+                            className="btn btn-primary w-md d-flex justify-content-center align-content-center"
                             type="submit"
+                            disabled={loading}
                           >
+                            {loading ? (
+                              <span
+                                className="spinner-border spinner-border-sm me-2"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                            ) : null}
                             Reset
                           </button>
                         </Col>

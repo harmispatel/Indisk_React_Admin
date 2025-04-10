@@ -35,8 +35,11 @@ const RestaurantOwner = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [viewRestaurant, setViewRestaurant] = useState(false);
   const [viewRestaurantData, setViewRestaurantData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getRestaurantData = () => {
+    setLoading(true);
     restaurantService
       .getRestaurantOwner()
       .then((res) => {
@@ -44,7 +47,8 @@ const RestaurantOwner = () => {
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -235,6 +239,7 @@ const RestaurantOwner = () => {
         .required("Website link is required!"),
     }),
     onSubmit: (values) => {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append("restaurant_name", values.restaurant_name);
       formData.append("email", values.email);
@@ -258,7 +263,8 @@ const RestaurantOwner = () => {
               toast.error(res.message);
             }
           })
-          .catch((err) => toast.error(err));
+          .catch((err) => toast.error(err))
+          .finally(() => setIsLoading(false));
       } else {
         restaurantService
           .addRestaurantOwner(formData)
@@ -272,7 +278,8 @@ const RestaurantOwner = () => {
               toast.error(res.message);
             }
           })
-          .catch((err) => toast.error(err));
+          .catch((err) => toast.error(err))
+          .finally(() => setIsLoading(false));
       }
     },
   });
@@ -287,23 +294,37 @@ const RestaurantOwner = () => {
             title="Manage Restaurant Owners"
             breadcrumbItem="Restaurant Owners"
           />
-          <Row>
-            <Col lg="12">
-              <Card>
-                <CardBody>
-                  <TableContainer
-                    columns={columns}
-                    data={restaurantOwnerData}
-                    isGlobalFilter={true}
-                    isAddAdminUser={true}
-                    handleAddRestaurantOwner={handleAddRestaurantOwner}
-                    customPageSize={10}
-                    className="custom-header-css"
-                  />
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
+
+          {loading ? (
+            <div className="text-center mt-5 pt-5">
+              <span
+                className="spinner-border spinner-border-md"
+                role="status"
+                aria-hidden="true"
+                style={{ width: "3rem", height: "3rem" }}
+              ></span>
+            </div>
+          ) : (
+            <>
+              <Row>
+                <Col lg="12">
+                  <Card>
+                    <CardBody>
+                      <TableContainer
+                        columns={columns}
+                        data={restaurantOwnerData}
+                        isGlobalFilter={true}
+                        isAddAdminUser={true}
+                        handleAddRestaurantOwner={handleAddRestaurantOwner}
+                        customPageSize={10}
+                        className="custom-header-css"
+                      />
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+            </>
+          )}
 
           <Modal
             isOpen={restaurantModel}
@@ -499,7 +520,18 @@ const RestaurantOwner = () => {
                 <Row>
                   <Col>
                     <div className="text-end">
-                      <Button type="submit" color="success">
+                      <Button
+                        type="submit"
+                        color="success"
+                        disabled={isLoading}
+                      >
+                        {isLoading && (
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        )}
                         {isEdit ? "Update" : "Save"}
                       </Button>
                     </div>
