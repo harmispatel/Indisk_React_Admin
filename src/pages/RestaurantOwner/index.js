@@ -215,8 +215,8 @@ const RestaurantOwner = () => {
         .email("Invalid email format")
         .required("Email is required!"),
       contact: Yup.string()
-        .matches(/^\d{10}$/, "Contact must be 10 digits")
-        .required("Contact is required!"),
+        .required("Contact is required!")
+        .matches(/^\d+$/, "Contact must be only numbers"),
       logo: Yup.mixed()
         .test("fileRequired", "Logo image is required!", function (value) {
           if (isEdit && typeof value === "string") return true;
@@ -230,13 +230,7 @@ const RestaurantOwner = () => {
           if (!value || typeof value === "string") return true;
           return ["image/jpg", "image/jpeg", "image/png"].includes(value.type);
         }),
-
-      description: Yup.string().required("Description is required!"),
-      tagLine: Yup.string().required("Tagline is required!"),
       isActive: Yup.string().required("Status is required!"),
-      website_link: Yup.string()
-        .url("Must be a valid website URL")
-        .required("Website link is required!"),
     }),
     onSubmit: (values) => {
       setIsLoading(true);
@@ -388,7 +382,7 @@ const RestaurantOwner = () => {
                       <Label className="form-label">Contact</Label>
                       <Input
                         name="contact"
-                        type="text"
+                        type="number"
                         placeholder="Enter contact"
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -612,7 +606,9 @@ const RestaurantOwner = () => {
                           Website link:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.website_link}
+                          {viewRestaurantData.website_link.length > 0
+                            ? viewRestaurantData.website_link
+                            : "N/A"}
                         </div>
                       </div>
 
@@ -621,7 +617,9 @@ const RestaurantOwner = () => {
                           TagLine:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.tagLine}
+                          {viewRestaurantData.tagLine.length > 0
+                            ? viewRestaurantData.tagLine
+                            : "N/A"}
                         </div>
                       </div>
 
@@ -630,7 +628,9 @@ const RestaurantOwner = () => {
                           Description:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.description}
+                          {viewRestaurantData.description.length > 0
+                            ? viewRestaurantData.description
+                            : "N/A"}
                         </div>
                       </div>
 
