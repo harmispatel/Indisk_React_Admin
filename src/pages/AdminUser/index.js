@@ -25,6 +25,9 @@ import toast from "react-hot-toast";
 import DeleteModal from "../../components/Common/DeleteModal";
 
 const AdminUser = () => {
+  const authUserString = localStorage.getItem("authUser");
+  const authUserObject = JSON.parse(authUserString);
+
   const [addAdminModel, setAdminModel] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState(null);
@@ -53,7 +56,7 @@ const AdminUser = () => {
   const getAdminData = () => {
     setLoading(true);
     adminService
-      .getAdmin()
+      .getAdmin({ user_id: authUserObject?._id })
       .then((res) => {
         setAdminData(res?.data);
       })
@@ -99,7 +102,7 @@ const AdminUser = () => {
     if (!deleteUser) return;
 
     adminService
-      .deleteAdmin({ id: deleteUser._id })
+      .deleteAdmin({ id: deleteUser._id, user_id: authUserObject?._id })
       .then((res) => {
         if (res.success === true) {
           toast.success(res.message);
@@ -218,12 +221,13 @@ const AdminUser = () => {
         })
         .test("fileFormat", "Unsupported file format", function (value) {
           if (!value || typeof value === "string") return true;
-          return ["image/jpg", "image/jpeg", "image/png"].includes(value.type);
+          return ["image/jpg", "image/jpeg", "image/png", "image/webp"].includes(value.type);
         }),
     }),
     onSubmit: (values) => {
       setIsLoading(true);
       const formData = new FormData();
+      formData.append("user_id", authUserObject?._id);
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("password", values.password);

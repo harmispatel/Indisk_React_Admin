@@ -1,9 +1,10 @@
 import Call from "./Call";
 
-const getRestaurant = async () => {
+const getRestaurant = async (data) => {
   let d = await Call({
     path: "api/restaurant-list",
-    method: "GET",
+    method: "POST",
+    data,
   });
   return d;
 };

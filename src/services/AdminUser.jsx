@@ -1,9 +1,10 @@
 import Call from "./Call";
 
-const getAdmin = async () => {
+const getAdmin = async (data) => {
   let d = await Call({
     path: "api/admin-list",
-    method: "GET",
+    method: "POST",
+    data,
   });
   return d;
 };

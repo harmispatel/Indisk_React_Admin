@@ -26,6 +26,8 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 const RestaurantOwner = () => {
+  const authUserString = localStorage.getItem("authUser");
+  const authUserObject = JSON.parse(authUserString);
   const [restaurantOwnerData, setRestaurantOwnerData] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteRestaurant, setDeleteRestaurant] = useState(null);
@@ -41,7 +43,7 @@ const RestaurantOwner = () => {
   const getRestaurantData = () => {
     setLoading(true);
     restaurantService
-      .getRestaurantOwner()
+      .getRestaurantOwner({ user_id: authUserObject?._id })
       .then((res) => {
         setRestaurantOwnerData(res?.data);
       })
@@ -93,7 +95,7 @@ const RestaurantOwner = () => {
         accessor: "isActive",
         filterable: true,
         Cell: ({ value }) => (
-          <Badge color={value === "true" ? "success" : "danger"}>
+          <Badge color={value === "Active" ? "success" : "danger"}>
             {value.charAt(0).toUpperCase() + value.slice(1)}
           </Badge>
         ),
@@ -168,7 +170,10 @@ const RestaurantOwner = () => {
     if (!deleteRestaurant) return;
 
     restaurantService
-      .deleteRestaurantOwner({ id: deleteRestaurant._id })
+      .deleteRestaurantOwner({
+        id: deleteRestaurant._id,
+        user_id: authUserObject?._id,
+      })
       .then((res) => {
         if (res.success === true) {
           toast.success(res.message);
@@ -204,10 +209,12 @@ const RestaurantOwner = () => {
       email: restaurant?.email || "",
       contact: restaurant?.contact || "",
       logo: restaurant?.logo || "",
-      description: restaurant?.description || "",
-      tagLine: restaurant?.tagLine || "",
+      description:
+        restaurant?.description === "null" ? null : restaurant?.description,
+      tagLine: restaurant?.tagLine === "null" ? null : restaurant?.tagLine,
       isActive: restaurant?.isActive || "",
-      website_link: restaurant?.website_link || "",
+      website_link:
+        restaurant?.website_link === "null" ? null : restaurant?.website_link,
     },
     validationSchema: Yup.object({
       restaurant_name: Yup.string().required("Restaurant name is required!"),
@@ -228,21 +235,27 @@ const RestaurantOwner = () => {
         })
         .test("fileFormat", "Unsupported file format", function (value) {
           if (!value || typeof value === "string") return true;
-          return ["image/jpg", "image/jpeg", "image/png"].includes(value.type);
+          return [
+            "image/jpg",
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+          ].includes(value.type);
         }),
       isActive: Yup.string().required("Status is required!"),
     }),
     onSubmit: (values) => {
       setIsLoading(true);
       const formData = new FormData();
+      formData.append("user_id", authUserObject?._id);
       formData.append("restaurant_name", values.restaurant_name);
       formData.append("email", values.email);
       formData.append("contact", values.contact);
       formData.append("logo", values.logo);
-      formData.append("description", values.description);
-      formData.append("tagLine", values.tagLine);
+      formData.append("description", values.description || null);
+      formData.append("tagLine", values.tagLine || null);
       formData.append("isActive", values.isActive);
-      formData.append("website_link", values.website_link);
+      formData.append("website_link", values.website_link || null);
 
       if (isEdit) {
         formData.append("id", restaurant?._id);
@@ -606,9 +619,9 @@ const RestaurantOwner = () => {
                           Website link:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.website_link.length > 0
-                            ? viewRestaurantData.website_link
-                            : "N/A"}
+                          {viewRestaurantData.website_link === "null"
+                            ? "N/A"
+                            : viewRestaurantData?.website_link}
                         </div>
                       </div>
 
@@ -617,9 +630,9 @@ const RestaurantOwner = () => {
                           TagLine:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.tagLine.length > 0
-                            ? viewRestaurantData.tagLine
-                            : "N/A"}
+                          {viewRestaurantData.tagLine === "null"
+                            ? "N/A"
+                            : viewRestaurantData.tagLine}
                         </div>
                       </div>
 
@@ -628,9 +641,9 @@ const RestaurantOwner = () => {
                           Description:
                         </Label>
                         <div className="border rounded p-2 bg-light">
-                          {viewRestaurantData.description.length > 0
-                            ? viewRestaurantData.description
-                            : "N/A"}
+                          {viewRestaurantData.description === "null"
+                            ? "N/A"
+                            : viewRestaurantData.description}
                         </div>
                       </div>
 

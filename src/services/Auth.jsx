@@ -18,9 +18,19 @@ const ForgotPassword = async (data) => {
   return d;
 };
 
+const ResetPassword = async (data) => {
+  let d = await Call({
+    path: "api/reset-password",
+    method: "post",
+    data,
+  });
+  return d;
+};
+
 const exportObject = {
   Login,
   ForgotPassword,
+  ResetPassword,
 };
 
 export default exportObject;

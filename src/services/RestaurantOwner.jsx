@@ -1,9 +1,10 @@
 import Call from "./Call";
 
-const getRestaurantOwner = async () => {
+const getRestaurantOwner = async (data) => {
   let d = await Call({
     path: "api/restaurant-owner-list",
-    method: "GET",
+    method: "POST",
+    data,
   });
   return d;
 };

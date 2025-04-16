@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard/index";
 import AdminUser from "../pages/AdminUser";
 import RestaurantOwner from "../pages/RestaurantOwner";
 import Restaurant from "../pages/Restaurant";
+import ResetPassword from "../pages/Authentication/ResetPassword";
 
 const authProtectedRoutes = [
   { path: "/", component: <Dashboard /> },
@@ -28,6 +29,7 @@ const publicRoutes = [
 
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPwd /> },
+  { path: "/reset-password/:token", component: <ResetPassword /> },
 ];
 
 export { authProtectedRoutes, publicRoutes };

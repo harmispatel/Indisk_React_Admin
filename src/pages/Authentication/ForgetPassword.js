@@ -40,6 +40,7 @@ const ForgetPasswordPage = () => {
         .then((res) => {
           if (res.success === true) {
             toast.success(res.message);
+            validation.resetForm();
           } else {
             toast.error(res.message);
           }
@@ -56,26 +57,24 @@ const ForgetPasswordPage = () => {
   document.title = "Forget Password | Indisk";
 
   return (
-    <React.Fragment>
-      <div className="home-btn d-none d-sm-block">
-        <Link to="/" className="text-dark">
-          <i className="bx bx-home h2" />
-        </Link>
-      </div>
-      <div className="account-pages my-5 pt-sm-5">
+    <>
+      <div className="account-pages">
         <Container>
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
               <Card className="overflow-hidden">
-                <div className="bg-primary bg-softbg-soft-primary">
+                <div className="bg-primary bg-soft">
                   <Row>
-                    <Col xs={7}>
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to Ecommerce.</p>
+                    <Col xs={9}>
+                      <div className="p-4">
+                        <h5 className="text-primary">Forgot your password?</h5>
+                        <p className="text-muted">
+                          No worries! Just enter your email and we’ll help you
+                          reset it.
+                        </p>
                       </div>
                     </Col>
-                    <Col className="col-5 login-bg-image">
+                    <Col className="col-3 login-bg-image">
                       <img src={profile} alt="" />
                     </Col>
                   </Row>
@@ -101,8 +100,10 @@ const ForgetPasswordPage = () => {
                       class="alert alert-success text-center mb-4"
                       role="alert"
                     >
-                      Enter your Email and instructions will be sent to you!{" "}
+                      Enter your registered email address below and we’ll send
+                      you instructions to reset your password.
                     </div>
+
                     <Form
                       className="form-horizontal"
                       onSubmit={(e) => {
@@ -158,13 +159,13 @@ const ForgetPasswordPage = () => {
                     </Form>
                     <div className="mt-5 text-center">
                       <p>
-                        Go back to{" "}
                         <Link
                           to="/login"
-                          className="font-weight-medium text-primary"
+                          className="font-weight-medium text-primary d-flex align-items-center justify-content-center"
                         >
+                          <i className="mdi mdi-arrow-left me-1" /> Go back to
                           Login
-                        </Link>{" "}
+                        </Link>
                       </p>
                     </div>
                   </div>
@@ -174,7 +175,7 @@ const ForgetPasswordPage = () => {
           </Row>
         </Container>
       </div>
-    </React.Fragment>
+    </>
   );
 };
 

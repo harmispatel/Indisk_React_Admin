@@ -46,7 +46,7 @@ const Login = () => {
         .then((res) => {
           if (res.success === true) {
             toast.success(res.message);
-            localStorage.setItem("authUser", JSON.stringify(values));
+            localStorage.setItem("authUser", JSON.stringify(res?.data));
             navigate("/");
           } else {
             toast.error(res.message);
@@ -72,13 +72,16 @@ const Login = () => {
               <Card className="overflow-hidden">
                 <div className="bg-primary bg-soft">
                   <Row>
-                    <Col xs={7}>
+                    <Col xs={9}>
                       <div className="text-primary p-4">
-                        <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to Indisk</p>
+                        <h5 className="text-primary">Welcome to Indisk</h5>
+                        <p className="text-muted">
+                          Sign in to access your personalized dashboard and
+                          services
+                        </p>
                       </div>
                     </Col>
-                    <Col className="col-5 login-bg-image">
+                    <Col className="col-3 login-bg-image">
                       <img src={profile} alt="" />
                     </Col>
                   </Row>
