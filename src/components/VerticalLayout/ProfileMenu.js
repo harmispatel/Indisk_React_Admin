@@ -4,7 +4,7 @@ import { Dropdown, DropdownToggle, DropdownMenu } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
 import withRouter from "../Common/withRouter";
 
-import user1 from "../../assets/images/users/avatar-1.jpg";
+import user1 from "../../assets/images/users/avatar-2.jpg";
 
 const ProfileMenu = () => {
   const navigate = useNavigate();

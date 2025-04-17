@@ -50,7 +50,7 @@ function GlobalFilter({
           </div>
         </div>
       </Col>
-      {isJobListGlobalFilter && <JobListGlobalFilter />}
+      {/* <JobListGlobalFilter /> */}
     </React.Fragment>
   );
 }

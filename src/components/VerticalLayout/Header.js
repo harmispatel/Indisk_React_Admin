@@ -2,17 +2,10 @@ import PropTypes from "prop-types";
 import React, { useState } from "react";
 
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 
 import ProfileMenu from "./ProfileMenu";
 
-import logo from "../../assets/images/logo.svg";
-import logoLightSvg from "../../assets/images/logo-light.svg";
-
-import {
-  toggleLeftmenu,
-  changeSidebarType,
-} from "../../store/actions";
+import { toggleLeftmenu, changeSidebarType } from "../../store/actions";
 
 const Header = () => {
   const [search, setsearch] = useState(false);
@@ -32,20 +25,6 @@ const Header = () => {
       <header id="page-topbar">
         <div className="navbar-header">
           <div className="d-flex">
-            <div className="navbar-brand-box d-lg-none d-md-block">
-              <Link to="/" className="logo logo-dark">
-                <span className="logo-sm">
-                  <img src={logo} alt="" height="22" />
-                </span>
-              </Link>
-
-              <Link to="/" className="logo logo-light">
-                <span className="logo-sm">
-                  <img src={logoLightSvg} alt="" height="22" />
-                </span>
-              </Link>
-            </div>
-
             <button
               type="button"
               onClick={() => {
@@ -59,7 +38,7 @@ const Header = () => {
           </div>
 
           <div className="d-flex">
-            <div className="dropdown d-inline-block d-lg-none ms-2">
+            <div className="dropdown d-inline-block ms-2">
               <button
                 onClick={() => {
                   setsearch(!search);
@@ -115,7 +94,4 @@ Header.propTypes = {
   toggleLeftmenu: PropTypes.func,
 };
 
-export default connect(
-  toggleLeftmenu,
-  changeSidebarType
-)(Header);
+export default connect(toggleLeftmenu, changeSidebarType)(Header);
